@@ -1,0 +1,47 @@
+.face {
+  height: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: height 0.5s var(--ease);
+}
+
+.assistant:not([data-mode='closed']) .face {
+  height: 60px;
+}
+
+.eyes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: gap 0.5s var(--ease);
+}
+
+.assistant:not([data-mode='closed']) .eyes {
+  gap: 24px;
+}
+
+.eye {
+  width: 8px;
+  height: 14px;
+  display: block;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 6px #ffffff,
+    0 0 14px #75cfff,
+    0 0 26px #168dff;
+  animation: blink 4.5s infinite;
+  transition: width 0.5s var(--ease), height 0.5s var(--ease);
+}
+
+.assistant:not([data-mode='closed']) .eye {
+  width: 12px;
+  height: 20px;
+}
+
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%           { transform: scaleY(0.08); }
+}
