@@ -1,15 +1,25 @@
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+}
+
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f2f3f5; /* simula a área de trabalho */
+  overflow: visible;
 }
 
 .desktop {
-  min-height: 100vh;
   width: 100%;
+  min-height: 0;
+  background: transparent;
 }

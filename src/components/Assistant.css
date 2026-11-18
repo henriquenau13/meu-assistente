@@ -14,7 +14,7 @@
   height: 40px;
 
   z-index: 1000;
-  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.18));
+  will-change: width, height;
 
   transition:
     width 0.5s var(--ease),
@@ -78,7 +78,7 @@
 
 .layer {
   position: absolute;
-  top: 60px;             /* logo abaixo dos olhos */
+  top: 60px;
   left: 0;
 
   opacity: 0;
