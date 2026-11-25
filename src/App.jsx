@@ -1,11 +1,14 @@
 import Assistant from './components/Assistant'
+import { EyesProvider } from './eyes'
 import './App.css'
 
 function App() {
   return (
-    <main className="desktop">
-      <Assistant />
-    </main>
+    <EyesProvider>
+      <main className="desktop">
+        <Assistant />
+      </main>
+    </EyesProvider>
   )
 }
 

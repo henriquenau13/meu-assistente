@@ -2,19 +2,18 @@ import { useEffect, useState } from 'react'
 
 const WEEK_LABELS = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB']
 
-function TodayPage() {
+function TodayWidget() {
   const [now, setNow] = useState(new Date())
 
   // Compromisso de exemplo: sempre daqui a 2h13min (provisório)
   const [event] = useState(() => new Date(Date.now() + 133 * 60000))
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000)
+    const timer = setInterval(() => setNow(new Date()), 10000)
     return () => clearInterval(timer)
   }, [])
 
   const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-
   const rawDate = now.toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: 'numeric',
@@ -40,7 +39,7 @@ function TodayPage() {
 
   return (
     <div className="today">
-      <div>
+      <div className="today-left">
         <div className="today-time">{time}</div>
         <div className="today-date">{date}</div>
 
@@ -57,9 +56,9 @@ function TodayPage() {
         </div>
       </div>
 
-      <div>
-        <div className="card hero" style={{ '--i': 0 }}>
-          <small>Próximo compromisso</small>
+      <div className="today-right">
+        <div className="w-card hero" style={{ '--i': 0 }}>
+          <span className="w-label">Próximo compromisso</span>
           <div className="hero-title">Reunião de projeto</div>
           <div className="hero-meta">
             <span>{eventTime}</span>
@@ -71,11 +70,11 @@ function TodayPage() {
         </div>
 
         <div className="chips">
-          <div className="card chip" style={{ '--i': 1 }}>
+          <div className="w-card chip" style={{ '--i': 1 }}>
             <i>✓</i>
             <span><b>3</b> tarefas</span>
           </div>
-          <div className="card chip" style={{ '--i': 2 }}>
+          <div className="w-card chip" style={{ '--i': 2 }}>
             <i className="pulse"></i>
             <span><b>2</b> novas</span>
           </div>
@@ -85,4 +84,4 @@ function TodayPage() {
   )
 }
 
-export default TodayPage
+export default TodayWidget

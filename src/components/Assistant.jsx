@@ -1,36 +1,38 @@
-import { useEffect, useRef, useState } from 'react'
-import Eyes from './Eyes'
+import { useRef, useState } from 'react'
+import { Eyes, useMood } from '../eyes'
 import QuickPanel from './QuickPanel'
+import { WIDGETS } from './widgets'
 import './Assistant.css'
 
-const SLEEPY_AFTER = 15000 // 15s sem uso -> sonolento (use 5000 para testar rápido)
-const SLEEP_AFTER = 4000   // +4s -> dormindo
+// Cápsula sem widget aberto (barra com os nomes embaixo dos ícones)
+const IDLE_HEIGHT = 132
+// Cápsula com widget aberto (barra compacta, sem os nomes)
+const BAR_HEIGHT = 120
+// Espaço entre a barra e o widget (precisa bater com o CSS)
+const WIDGET_GAP = 8
 
 function Assistant() {
   const [mode, setMode] = useState('closed') // closed | quick | full
-  const [mood, setMood] = useState('neutral') // neutral | sleepy | sleeping | waking
+  const [widget, setWidget] = useState(null) // id do widget aberto (ou null)
   const closeTimer = useRef(null)
 
-  // Ciclo de humor: acordado -> sonolento -> dormindo, e acordando -> normal
-  useEffect(() => {
-    let timer
+  const { mood, wake } = useMood(mode)
 
-    if (mood === 'waking') {
-      timer = setTimeout(() => setMood('neutral'), 800)
-    } else if (mode === 'closed' && mood === 'neutral') {
-      timer = setTimeout(() => setMood('sleepy'), SLEEPY_AFTER)
-    } else if (mode === 'closed' && mood === 'sleepy') {
-      timer = setTimeout(() => setMood('sleeping'), SLEEP_AFTER)
-    }
-
-    return () => clearTimeout(timer)
-  }, [mode, mood])
+  // A altura da cápsula acompanha o widget aberto
+  const widgetHeight = WIDGETS.find((w) => w.id === widget)?.height
+  const quickHeight = widgetHeight
+    ? BAR_HEIGHT + widgetHeight + WIDGET_GAP
+    : IDLE_HEIGHT
 
   const handleEnter = () => {
     clearTimeout(closeTimer.current)
     window.assistantWindow?.setIgnoreMouse(false)
+
+    // ao abrir do zero, começa sem nenhum widget aberto
+    if (mode === 'closed') setWidget(null)
+
     setMode((m) => (m === 'closed' ? 'quick' : m))
-    setMood((m) => (m === 'sleeping' || m === 'sleepy' ? 'waking' : m))
+    wake()
   }
 
   const handleLeave = () => {
@@ -47,6 +49,7 @@ function Assistant() {
       className="assistant"
       data-mode={mode}
       data-mood={mood}
+      style={{ '--quick-h': `${quickHeight}px` }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
@@ -54,7 +57,11 @@ function Assistant() {
         <Eyes mood={mood} active={mode === 'closed' && mood === 'neutral'} />
 
         <div className="layer layer-quick">
-          <QuickPanel onExpand={() => setMode('full')} />
+          <QuickPanel
+            widget={widget}
+            onSelect={setWidget}
+            onExpand={() => setMode('full')}
+          />
         </div>
 
         <div className="layer layer-full">

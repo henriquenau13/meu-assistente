@@ -8,6 +8,8 @@ import {
 } from "electron";
 
 import path from "node:path";
+import { startMedia, stopMedia } from "./media.js";
+import { startVolume, stopVolume } from "./volume.js";
 
 let mainWindow;
 let tray;
@@ -179,9 +181,13 @@ if (!gotTheLock) {
   app.whenReady().then(() => {
     createTray();
     createWindow();
+    startMedia(() => mainWindow);  // música: lê o Windows
+    startVolume(() => mainWindow); // volume: lê e controla o Windows
   });
 }
 
 app.on("before-quit", () => {
   isQuitting = true;
+  stopMedia();
+  stopVolume();
 });

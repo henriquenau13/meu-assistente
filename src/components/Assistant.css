@@ -22,8 +22,8 @@
 }
 
 .assistant[data-mode='quick'] {
-  width: 600px;          /* PAINEL RÁPIDO */
-  height: 330px;
+  width: 600px;                    /* PAINEL RÁPIDO */
+  height: var(--quick-h, 120px);   /* altura vem do widget aberto */
 }
 
 .assistant[data-mode='full'] {
@@ -87,7 +87,7 @@
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.layer-quick { width: 600px; height: 270px; }
+.layer-quick { width: 600px; }
 .layer-full  { width: 900px; height: 480px; }
 
 .assistant[data-mode='quick'] .layer-quick,

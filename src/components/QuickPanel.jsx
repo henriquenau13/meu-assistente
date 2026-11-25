@@ -1,107 +1,74 @@
-import { useRef, useState } from 'react'
-import QuickHeader from './QuickHeader'
-import HomePage from './pages/HomePage'
-import TodayPage from './pages/TodayPage'
-import MusicPage from './pages/MusicPage'
-import OrganizePage from './pages/OrganizePage'
+import { useState } from 'react'
+import Icon from './Icon'
+import ClockWeather from './ClockWeather'
+import { WIDGETS } from './widgets'
 import './QuickPanel.css'
 
-const PAGES = [
-  { id: 'home', title: 'Início', Component: HomePage },
-  { id: 'today', title: 'Hoje', Component: TodayPage },
-  { id: 'music', title: 'Música', Component: MusicPage },
-  { id: 'organize', title: 'Organização', Component: OrganizePage },
-]
+// widget = id do widget aberto (ou null)
+// onSelect = pede para abrir/fechar um widget
+function QuickPanel({ widget, onSelect, onExpand }) {
+  // Guarda o último widget aberto, para ele continuar visível enquanto fecha
+  const [shown, setShown] = useState(widget)
+  if (widget && widget !== shown) setShown(widget)
 
-function QuickPanel({ onExpand }) {
-  const [index, setIndex] = useState(0)
-  const [dragX, setDragX] = useState(0)
-  const [dragging, setDragging] = useState(false)
-  const startX = useRef(0)
-
-  const goTo = (i) => setIndex(Math.max(0, Math.min(PAGES.length - 1, i)))
-  const go = (id) => goTo(PAGES.findIndex((p) => p.id === id))
-
-  // ----- arrastar -----
-  const onDown = (e) => {
-    startX.current = e.clientX
-    setDragging(true)
-  }
-  const onMove = (e) => {
-    if (dragging) setDragX(e.clientX - startX.current)
-  }
-  const onUp = () => {
-    if (!dragging) return
-    if (dragX < -60) goTo(index + 1)
-    else if (dragX > 60) goTo(index - 1)
-    setDragging(false)
-    setDragX(0)
-  }
+  const current = WIDGETS.find((w) => w.id === shown)
+  const isOpen = widget !== null
 
   return (
     <div className="quick">
-      <QuickHeader />
+      {/* "compact" esconde os nomes quando há um widget aberto */}
+      <div className={`tabbar ${isOpen ? 'compact' : ''}`}>
+        <ClockWeather />
 
-      <div
-        className="quick-viewport"
-        onPointerDown={onDown}
-        onPointerMove={onMove}
-        onPointerUp={onUp}
-        onPointerLeave={onUp}
-      >
-        <div
-          className={`quick-track ${dragging ? 'dragging' : ''}`}
-          style={{ transform: `translateX(calc(${-index * 100}% + ${dragX}px))` }}
-        >
-          {PAGES.map(({ id, Component }, i) => (
-            <div key={id} className={`quick-page ${i === index ? 'active' : ''}`}>
-              <Component go={go} onExpand={onExpand} />
-            </div>
+        <div className="tabs">
+          {WIDGETS.map(({ id, title, icon }) => (
+            <button
+              key={id}
+              className={`tab-item ${id === widget ? 'active' : ''}`}
+              onClick={() => onSelect(id === widget ? null : id)}
+              aria-label={title}
+              title={isOpen ? title : undefined}
+            >
+              <span className="tab-ico">
+                <Icon name={icon} />
+              </span>
+              <span className="tab-label">{title}</span>
+            </button>
           ))}
         </div>
-      </div>
 
-      <div className="quick-footer">
-        <span className="footer-title">{PAGES[index].title}</span>
-
-        <div className="nav">
+        <div className="tabbar-right">
           <button
-            className="icon-btn"
-            onClick={() => goTo(index - 1)}
-            disabled={index === 0}
-            aria-label="Página anterior"
+            className={`tab round close ${isOpen ? 'show' : ''}`}
+            onClick={() => onSelect(null)}
+            tabIndex={isOpen ? 0 : -1}
+            aria-label="Fechar"
+            title="Fechar"
           >
-            ‹
+            <Icon name="close" />
           </button>
 
-          <div className="dots">
-            {PAGES.map(({ id }, i) => (
-              <button
-                key={id}
-                className={`dot ${i === index ? 'active' : ''}`}
-                onClick={() => goTo(i)}
-                aria-label={`Ir para página ${i + 1}`}
-              />
-            ))}
-          </div>
-
           <button
-            className="icon-btn"
-            onClick={() => goTo(index + 1)}
-            disabled={index === PAGES.length - 1}
-            aria-label="Próxima página"
+            className="tab round"
+            onClick={onExpand}
+            aria-label="Abrir tudo"
+            title="Abrir tudo"
           >
-            ›
+            <Icon name="expand" />
           </button>
         </div>
-
-        <button className="open-all" onClick={onExpand}>
-          Abrir tudo
-          <svg viewBox="0 0 24 24">
-            <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
-          </svg>
-        </button>
       </div>
+
+      {current && (
+        <div
+          className={`widget-area ${isOpen ? 'open' : ''}`}
+          style={{ height: current.height }}
+        >
+          <div className="widget" key={shown}>
+            <current.Component />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
